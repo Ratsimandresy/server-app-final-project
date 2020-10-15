@@ -73,7 +73,7 @@ router.delete("/tags/:id", async (req, res, next) => {
     try {
         console.log('UPDATE TAG for admin');
         console.log(req.params.id);
-        //console.log(req.body.id);
+        // console.log(req.body.id);
 
         const deletedTag = await Tag.findByIdAndDelete(req.params.id);
         res.status(200).json(deletedTag);
