@@ -11,8 +11,29 @@ const salt = 10;
 
 
 /************** ALL RESSOURCES *************/
-router.get("/", (req, res, next) => {
+router.get("/", async (req, res, next) => {
     console.log('GET ALL Ressouces for admin');
+    try {
+        const users = await User.find({});
+        const events = await Event.find({});
+    
+        const tags = await Tag.find({});
+        const categories = await Category.find({});
+
+        res.status(200).json({
+            users,
+            categories,
+            events,
+            tags,
+            message:"loaded all ressources"
+        });
+    }catch(errDb){
+        console.log(errDb);
+        res.status(500).json({
+            errDb,
+            message: "Error to load all ressources"
+        });
+    }
 });
 
 
