@@ -5,34 +5,55 @@ const User = require("../models/User");
 const Event = require("../models/Event");
 const upload = require("../config/cloudinary");
 
-router.patch("/:id", upload.single("profilImage"), (req, res, next) => {
-  const userId = req.session.currentUser;
+router.get("/", (req, res, next) => {
+  User.find()
+    .then((userRes) => res.status(200).json(userRes))
+    .catch((err) => {
+      res.status(200).json(err);
+    });
+});
 
-  if (req.file) {
-    req.body.profilImage = req.file.path;
-  }
+router.get("/:id/user", (req, res, next) => {
+  const userID = req.params.id;
+  User.findById(userID)
+    .then((userRes) => {
+      res.status(200).json(userRes);
+    })
+    .catch((err) => {
+      res.status(200).json(err);
+    });
+});
+
+router.post("/create", (req, res, next) => {
+  User.create(req.body)
+    .then((userRes) => {
+      res.status(200).json(userRes);
+    })
+    .catch((err) => {
+      res.status(200).json(err);
+    });
+});
+
+router.patch("/:id/edit", (req, res, next) => {
+  const userId = req.params.id;
 
   User.findByIdAndUpdate(userId, req.body, { new: true })
+    .then((userDocument) => {
+      res.status(200).json(userDocument);
+    })
+    .catch(next);
+});
+
+router.delete("/:id", (req, res, next) => {
+  User.findByIdAndDelete(req.params.id)
     .then((userRes) => {
       res.status(200).json(userRes);
     })
     .catch(next);
 });
 
-// router.post("/events/:idEvent/like", (req, res, next) => {});
+//Like an event
 
-// router.post("/events/:idEvent/dislike", (req, res, next) => {});
 
-// router.post("/events/:idEvent/rate", (req, res, next) => {});
-
-// router.patch("/events/:idEvent/rate", (req, res, next) => {});
-
-// router.patch("/events/:idEvent/like", (req, res, next) => {});
-
-// router.patch("/events/:idEvent/dislike", (req, res, next) => {});
-
-// router.patch("/follwing/:idUser/", (req, res, next) => {});
-
-// router.patch("/unfollow/:idUser/", (req, res, next) => {});
 
 module.exports = router;
