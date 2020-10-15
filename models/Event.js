@@ -45,7 +45,7 @@ const eventSchema = new Schema({
     rate:[{
         note: Number,
     }], 
-
+    noteAverage : Number,
     isWithPeople: Boolean
 });
 
