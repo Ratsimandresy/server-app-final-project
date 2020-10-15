@@ -3,7 +3,8 @@ const router = express.Router();
 const Event = require("../models/Event");
 const uploader = require("../config/cloudinary");
 
-// get all the events
+
+/************** GET ALL EVENTS *************/
 router.get("/", (req, res, next) => {
   Event.find()
     .then((eventsList) => {
@@ -12,26 +13,22 @@ router.get("/", (req, res, next) => {
     .catch((err) => res.status(500).json(err));
 });
 
-// get just one event
-router.get("/:id", (req, res, next) => {
-  Event.findById(req.params.id)
-    .then((oneEvent) => {
-      res.status(200).json(oneEvent);
-    })
-    .catch((err) => res.status(500).json(err));
-});
 
-// get the top 10 events // tested with Postman => doesn't work
+/******* GET THE TOP 10 EVENTS => TESTED WITH POSTMAN AND DOESN'T WORK ******/
 router.get("/sortedbyrate", (req, res, next) => {
-  Event
-    .find({ $sort: { noteAverage: 1 } })
-    .then((toto) => {
-      res.status(200).json(toto);
-    })
-    .catch((err) => res.status(500).json(err));
-});
+    console.log("I am here for sorted event")
+    var mysort = { noteAverage: -1 };
+    Event
+        .find().sort(mysort).limit(10)
+        .then((sortedEvent) => {
+            res.status(200).json(sortedEvent);
+        })
+        .catch(err => res.status(500).json(err))
+})
 
-// create an event
+
+
+/************** CREATE AN EVENT *************/
 router.post("/", uploader.single("image"), (req, res, next) => {
   const newEvent = req.body;
 
@@ -46,7 +43,15 @@ router.post("/", uploader.single("image"), (req, res, next) => {
     .catch((err) => res.status(500).json(err));
 });
 
-// update an event
+/************** GET JUST ONE EVENT *************/
+router.get("/:id", (req, res, next) => {
+    Event.findById(req.params.id).then((oneEvent) => {
+        res.status(200).json(oneEvent);
+    }).catch(err => res.status(500).json(err))
+})
+
+
+/************** UPDATE AN EVENT *************/
 router.patch("/:id", uploader.single("image"), (req, res, next) => {
   const updatedEvent = req.body;
 
@@ -61,7 +66,7 @@ router.patch("/:id", uploader.single("image"), (req, res, next) => {
     .catch((err) => res.status(500).json(err));
 });
 
-// delete an event
+/************** DELETE AN EVENT *************/
 router.delete("/:id", (req, res, next) => {
   Event.findByIdAndRemove(req.params.id)
     .then((deletedEvent) => {
