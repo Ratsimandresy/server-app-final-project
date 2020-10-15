@@ -1,22 +1,23 @@
-const { Router } = require("express");
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const Event = require("../models/Event");
 const upload = require("../config/cloudinary");
 
+router.get("/", (req, res, next) => {
+  res.send("yo");
+});
+ /*
 router.patch("/:id", upload.single("profilImage"), (req, res, next) => {
-  const userId = req.session.currentUser;
+    const userId = req.session.currentUser;
 
-  if (req.file) {
-    req.body.profilImage = req.file.path;
-  }
+    if (req.file) {
+        req.body.profilImage = req.file.path;
+    }
 
-  User.findByIdAndUpdate(userId, req.body, { new: true })
-    .then((userRes) => {
-      res.status(200).json(userRes);
-    })
-    .catch(next);
+    User.findByIdAndUpdate(userId, req.body, {new: true}).then((userRes) => {
+        res.status(200).json(userRes);
+    }).catch(next);
 });
 
 // router.post("/events/:idEvent/like", (req, res, next) => {});
@@ -34,5 +35,6 @@ router.patch("/:id", upload.single("profilImage"), (req, res, next) => {
 // router.patch("/follwing/:idUser/", (req, res, next) => {});
 
 // router.patch("/unfollow/:idUser/", (req, res, next) => {});
+*/
 
 module.exports = router;
