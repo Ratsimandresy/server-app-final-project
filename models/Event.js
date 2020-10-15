@@ -6,14 +6,14 @@ const eventSchema = new Schema({
     description: String,
     mainImageUrl: {
         type: String,
-        default:"images/event_ default.png",
+        default:"images/event_default.png",
     },
     images: [String],
     tags:[{
         type: Schema.Types.ObjectId,
         ref: "Tag"
     }],
-    catergory: {
+    category: {
         type: Schema.Types.ObjectId,
         ref: "Category"
     },
@@ -48,5 +48,7 @@ const eventSchema = new Schema({
 
     isWithPeople: Boolean
 });
+
+const Event = mongoose.model("Event", eventSchema);
 
 module.exports = Event;
