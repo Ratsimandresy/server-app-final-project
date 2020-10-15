@@ -16,7 +16,7 @@ const userSchema = new Schema({
   },
   address: String,
   gender: { type: String, enum: [male, female, other] },
-  role: { type: String, enum: [adimn, user] },
+  role: { type: String, enum: [admin, user] },
   events: [{ type: Schema.Types.ObjectId, ref: "Event" }],
   followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
   following: [{ type: Schema.Types.ObjectId, ref: "User" }],
