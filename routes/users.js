@@ -1,4 +1,3 @@
-const { Router } = require("express");
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
@@ -52,8 +51,26 @@ router.delete("/:id", (req, res, next) => {
     .catch(next);
 });
 
-//Like an event
+// Like an event
 
-
+// router.patch("/events/:id/Like", async (req, res, next) => {
+//   console.log("=======>>>>>> LIKE EVENT======>>>>>");
+//   try {
+//     const userID = "5f871935e9454c288a52dd12";
+//     const eventID = req.params.id;
+//     const eventFound = await Event.findById(eventID);
+//     const userInEvent = eventFound.likes.find(like => {
+//         if (likes.includes(userID)) {
+//             console.log("<============found USRID ==========>")
+//         } else {
+//             console.log("noooooo user founddd!!!!!!!!")
+//         }
+//     })
+//   } catch {
+//     (err) => {
+//       next(err);
+//     };
+//   }
+// });
 
 module.exports = router;
