@@ -37,7 +37,6 @@ router.post("/", uploader.single("image"), (req, res, next) => {
     }
 
     newEvent.userId = req.session.currentUser;
-  
 
     Event.create(newEvent).then((eventDoc) => {
         res.status(201).json(eventDoc)
