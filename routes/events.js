@@ -30,10 +30,14 @@ router.get("/sortedbyrate", (req, res, next) => {
 /************** CREATE AN EVENT *************/
 router.post("/", uploader.single("image"), (req, res, next) => {
     const newEvent = req.body;
+    console.log("-------------------------------->",req.session.currentUser);
 
     if (req.file) {
         newEvent.image = req.file.path;
     }
+
+    newEvent.userId = req.session.currentUser;
+  
 
     Event.create(newEvent).then((eventDoc) => {
         res.status(201).json(eventDoc)
