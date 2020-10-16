@@ -34,7 +34,7 @@ router.post("/", uploader.single("image"), (req, res, next) => {
     newEvent.image = req.file.path;
   }
 
-  newEvent.userId = req.session.currentUser;
+    newEvent.userId = req.session.currentUser;
 
   // Event.create(newEvent)
   //   .then((eventDoc) => {
