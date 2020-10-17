@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const Event = require("../models/Event");
+const Tag = require("../models/Tag");
 const uploadCloud = require("../config/cloudinary");
 const bcrypt = require("bcrypt");
 const salt = 10;
@@ -21,14 +22,21 @@ router.get("/:id/user", (req, res, next) => {
     });
 });
 
-router.get("/me", (req, res, next) => {
-  const userId = req.session.currentUser;
-  console.log(userId);
-  User.findById(userId).then((userRes) => {
-      res.status(200).json(userRes);
-  }).catch((err) => {
-      res.status(500).json(err);
-  });
+router.get("/me", async (req, res, next) => {
+  try{
+    const userId = req.session.currentUser;
+    console.log(userId);
+    const currentUser = await User.findById(userId);
+    const userEvents = await Event.find({userId: userId}).populate('tags').populate('category');
+    console.log(currentUser);
+    console.log(userEvents);
+    res.status(200).json({
+      currentUser,
+      userEvents
+    });
+  }catch(errDb){
+    res.status(500).json(currentUser);
+  }
 });
 
 router.post("/create", (req, res, next) => {
