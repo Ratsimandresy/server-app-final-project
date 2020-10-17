@@ -45,6 +45,7 @@ app.use(function (req, res, next) {
 
 const authRouter = require("./routes/auth");
 const usersRouter = require("./routes/users");
+const tagsRouter = require("./routes/tags");
 const adminRouter = require("./routes/admin");
 const eventsRouter = require("./routes/events");
 const categoriesRouter = require("./routes/categories");
@@ -53,6 +54,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", usersRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/event", eventsRouter);
+app.use("/api/tags", tagsRouter);
 app.use("/api/categories", categoriesRouter);
 
 

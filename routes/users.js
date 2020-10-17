@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const Event = require("../models/Event");
-const upload = require("../config/cloudinary");
+const uploadCloud = require("../config/cloudinary");
+const bcrypt = require("bcrypt");
+const salt = 10;
 
 router.get("/", (req, res, next) => {
   User.find()
@@ -23,6 +25,16 @@ router.get("/:id/user", (req, res, next) => {
     });
 });
 
+router.get("/me", (req, res, next) => {
+  const userId = req.session.currentUser;
+  console.log(userId);
+  User.findById(userId).then((userRes) => {
+      res.status(200).json(userRes);
+  }).catch((err) => {
+      res.status(500).json(err);
+  });
+});
+
 router.post("/create", (req, res, next) => {
   User.create(req.body)
     .then((userRes) => {
@@ -41,6 +53,36 @@ router.patch("/:id/edit", (req, res, next) => {
       res.status(200).json(userDocument);
     })
     .catch(next);
+});
+
+router.patch("/update", uploadCloud.single("profilImage"), async (req, res, next) => {
+  console.log(req.session);
+  userId = req.session.currentUser;
+  
+  try {
+    const user = req.body;
+    console.log(req.file);
+    if(req.file){
+      user.profilImage = req.file.path;
+    }
+    if(req.body.newPassword) {
+      user.password =  bcrypt.hashSync(req.body.newPassword, salt);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, user, {new: true});
+    req.session.currentUser = updatedUser._id;
+    res.status(200).json({
+      updatedUser, 
+      message: "user updated successfully"
+    });
+  }catch(errDb){
+    console.log(errDb);
+    res.status(500).json({
+      errDb,
+      message: "Error, can't update this user"
+    });
+  }
+ 
 });
 
 router.delete("/:id", (req, res, next) => {

@@ -26,21 +26,34 @@ router.get("/sortedbyrate", (req, res, next) => {
 });
 
 /************** CREATE AN EVENT *************/
-router.post("/", uploader.single("image"), (req, res, next) => {
-  const newEvent = req.body;
-  console.log("-------------------------------->", req.session.currentUser);
+router.post("/", uploader.single("mainImageUrl"), async (req, res, next) => {
+  try {
+    const newEvent = req.body;
 
-  if (req.file) {
-    newEvent.image = req.file.path;
-  }
+    console.log(req.body);
+    if (req.file) {
+      newEvent.mainImageUrl = req.file.path;
+    }
+
+    if (newEvent.tags) {
+      console.log(newEvent.tags);
+      newEvent.tags = JSON.parse(newEvent.tags);
+    }
+    console.log(newEvent.tags);
 
     newEvent.userId = req.session.currentUser;
 
-  // Event.create(newEvent)
-  //   .then((eventDoc) => {
-  //     res.status(201).json(eventDoc);
-  //   })
-  //   .catch((err) => res.status(500).json(err));
+    const createdEvent = await Event.create(newEvent);
+    console.log(createdEvent);
+
+    res.status(200).json({
+      createdEvent,
+      message: "Event created successFully",
+    });
+  } catch (errDb) {
+    console.log(errDb);
+    res.status(500).json(errDb);
+  }
 
   Event.create(newEvent)
     .then((eventDoc) => {
