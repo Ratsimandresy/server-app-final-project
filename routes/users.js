@@ -13,14 +13,7 @@ router.get("/", (req, res, next) => {
     });
 });
 
-router.get("/:id", (req, res, next) => {
-    const userID = req.params.id;
-    User.findById(userID).then((userRes) => {
-        res.status(200).json(userRes);
-    }).catch((err) => {
-        res.status(200).json(err);
-    });
-});
+
 
 router.get("/me", async (req, res, next) => {
   try{
@@ -83,6 +76,15 @@ router.patch("/update", uploadCloud.single("profilImage"), async (req, res, next
     });
   }
  
+});
+
+router.get("/:id", (req, res, next) => {
+  const userID = req.params.id;
+  User.findById(userID).then((userRes) => {
+      res.status(200).json(userRes);
+  }).catch((err) => {
+      res.status(200).json(err);
+  });
 });
 
 router.delete("/:id", (req, res, next) => {
