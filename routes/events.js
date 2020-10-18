@@ -12,61 +12,57 @@ router.get("/", (req, res, next) => {
 })
 
 
-
 /******* GET THE TOP 10 EVENTS => TESTED WITH POSTMAN AND DOESN'T WORK ******/
 router.get("/sortedbyrate", (req, res, next) => {
     console.log("I am here for sorted event")
-    var mysort = { noteAverage: -1 };
-    Event
-        .find().sort(mysort).limit(10)
-        .then((sortedEvent) => {
-            res.status(200).json(sortedEvent);
-        })
-        .catch(err => res.status(500).json(err))
+    var mysort = {
+        noteAverage: -1
+    };
+    Event.find().sort(mysort).limit(10).then((sortedEvent) => {
+        res.status(200).json(sortedEvent);
+    }).catch(err => res.status(500).json(err))
 })
-
 
 
 /************** CREATE AN EVENT *************/
 router.post("/", uploader.single("mainImageUrl"), async (req, res, next) => {
 
-    try{
+    try {
         const newEvent = req.body;
-        
+
         console.log(req.body);
         if (req.file) {
             newEvent.mainImageUrl = req.file.path;
         }
 
-        if(newEvent.tags) {
+        if (newEvent.tags) {
             console.log(newEvent.tags)
             newEvent.tags = JSON.parse(newEvent.tags);
         }
         console.log(newEvent.tags);
 
         newEvent.userId = req.session.currentUser;
-        
+
         const createdEvent = await Event.create(newEvent);
         console.log(createdEvent);
 
-        res.status(200).json({
-            createdEvent,
-            message: "Event created successFully"
-        });
-       
-    }catch(errDb) {
+        res.status(200).json({createdEvent, message: "Event created successFully"});
+
+    } catch (errDb) {
         console.log(errDb);
         res.status(500).json(errDb);
     }
-})
+});
 
 
 /************** GET JUST ONE EVENT *************/
+
 router.get("/:id", (req, res, next) => {
-    Event.findById(req.params.id).then((oneEvent) => {
+    console.log('Get One Event');
+    Event.findById(req.params.id).populate("tags").populate("category").then((oneEvent) => {
         res.status(200).json(oneEvent);
-    }).catch(err => res.status(500).json(err))
-})
+    }).catch(err => res.status(500).json(err));
+});
 
 
 /************** UPDATE AN EVENT *************/
@@ -80,7 +76,7 @@ router.patch("/:id", uploader.single("image"), (req, res, next) => {
     Event.findByIdAndUpdate(req.params.id, updatedEvent, {new: true}).then(eventDoc => {
         res.status(200).json(eventDoc);
     }).catch(err => res.status(500).json(err))
-})
+});
 
 
 /************** DELETE AN EVENT *************/
