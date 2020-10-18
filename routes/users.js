@@ -12,7 +12,7 @@ router.get("/", (req, res, next) => {
     });
 });
 
-router.get("/:id/user", (req, res, next) => {
+router.get("/:id", (req, res, next) => {
     const userID = req.params.id;
     User.findById(userID).then((userRes) => {
         res.status(200).json(userRes);
