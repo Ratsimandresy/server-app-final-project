@@ -64,6 +64,7 @@ router.get("/:id", (req, res, next) => {
   Event.findById(req.params.id)
     .populate("tags")
     .populate("category")
+    .populate("userId")
     .then((oneEvent) => {
       res.status(200).json(oneEvent);
     })
@@ -71,15 +72,18 @@ router.get("/:id", (req, res, next) => {
 });
 
 /************** UPDATE AN EVENT *************/
-router.patch("/:id", uploader.single("image"), (req, res, next) => {
-  const updatedEvent = req.body;
 
+router.patch("/:id", uploader.single("mainImageUrl"), (req, res, next) => {
+  const updatedEvent = req.body;
+  console.log("====>>>>>", req.params.id);
+  console.log(updatedEvent);
   if (req.file) {
     updatedEvent.image = req.file.path;
   }
 
   Event.findByIdAndUpdate(req.params.id, updatedEvent, { new: true })
     .then((eventDoc) => {
+      console.log(eventDoc);
       res.status(200).json(eventDoc);
     })
     .catch((err) => res.status(500).json(err));
