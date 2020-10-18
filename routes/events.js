@@ -15,7 +15,9 @@ router.get("/", (req, res, next) => {
 /******* GET THE TOP 10 EVENTS => TESTED WITH POSTMAN AND DOESN'T WORK ******/
 router.get("/sortedbyrate", (req, res, next) => {
   console.log("I am here for sorted event");
-  var mysort = { noteAverage: -1 };
+  var mysort = {
+    noteAverage: -1,
+  };
   Event.find()
     .sort(mysort)
     .limit(10)
@@ -46,25 +48,22 @@ router.post("/", uploader.single("mainImageUrl"), async (req, res, next) => {
     const createdEvent = await Event.create(newEvent);
     console.log(createdEvent);
 
-    res.status(200).json({
-      createdEvent,
-      message: "Event created successFully",
-    });
+    res
+      .status(200)
+      .json({ createdEvent, message: "Event created successFully" });
   } catch (errDb) {
     console.log(errDb);
     res.status(500).json(errDb);
   }
-
-  Event.create(newEvent)
-    .then((eventDoc) => {
-      res.status(201).json(eventDoc);
-    })
-    .catch((err) => res.status(500).json(err));
 });
 
 /************** GET JUST ONE EVENT *************/
+
 router.get("/:id", (req, res, next) => {
+  console.log("Get One Event");
   Event.findById(req.params.id)
+    .populate("tags")
+    .populate("category")
     .then((oneEvent) => {
       res.status(200).json(oneEvent);
     })
