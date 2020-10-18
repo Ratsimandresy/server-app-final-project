@@ -59,7 +59,7 @@ router.post("/", uploader.single("mainImageUrl"), async (req, res, next) => {
 
 router.get("/:id", (req, res, next) => {
     console.log('Get One Event');
-    Event.findById(req.params.id).populate("tags").populate("category").then((oneEvent) => {
+    Event.findById(req.params.id).populate("tags").populate("category").populate("userId").then((oneEvent) => {
         res.status(200).json(oneEvent);
     }).catch(err => res.status(500).json(err));
 });
