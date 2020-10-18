@@ -6,7 +6,7 @@ const eventSchema = new Schema({
     description: String,
     mainImageUrl: {
         type: String,
-        default:"images/event_default.png",
+        default:"https://static.vecteezy.com/system/resources/thumbnails/000/246/312/original/mountain-lake-sunset-landscape-first-person-view.jpg",
     },
     images: [String],
     tags:[{
