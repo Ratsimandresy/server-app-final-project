@@ -26,21 +26,30 @@ router.get("/sortedbyrate", (req, res, next) => {
 
 /************** CREATE AN EVENT *************/
 router.post("/", uploader.single("mainImageUrl"), async (req, res, next) => {
+    console.log(req.body);
+    console.log(req.body.category);
 
     try {
         const newEvent = req.body;
 
-        console.log(req.body);
+        
         if (req.file) {
             newEvent.mainImageUrl = req.file.path;
+        }
+
+        if(newEvent.category === '') {
+            delete newEvent.category;
         }
 
         if (newEvent.tags) {
             console.log(newEvent.tags)
             newEvent.tags = JSON.parse(newEvent.tags);
         }
-        console.log(newEvent.tags);
-
+        
+        if(newEvent.location) {
+            
+        }
+        
         newEvent.userId = req.session.currentUser;
 
         const createdEvent = await Event.create(newEvent);
@@ -66,16 +75,25 @@ router.get("/:id", (req, res, next) => {
 
 
 /************** UPDATE AN EVENT *************/
-router.patch("/:id", uploader.single("image"), (req, res, next) => {
-    const updatedEvent = req.body;
+router.patch("/:id", uploader.single("mainImageUrl"), async (req, res, next) => {
+    console.log("PATCH update a event");
+    try {
+        const eventToUpdate = req.body;
+        const eventId = req.params.id;
+        if (req.file) {
+            eventToUpdate.mainImageUrl = req.file.path;
+        }
 
-    if (req.file) {
-        updatedEvent.image = req.file.path;
+        const updatedEvent = await Event.findByIdAndUpdate(eventId, eventToUpdate, {new: true});
+        console.log(updatedEvent);
+
+        res.status(200).json(updatedEvent);
+
+    }catch(errDb) {
+        console.log(errDb);
+        res.status(500).json(errDb);
     }
 
-    Event.findByIdAndUpdate(req.params.id, updatedEvent, {new: true}).then(eventDoc => {
-        res.status(200).json(eventDoc);
-    }).catch(err => res.status(500).json(err))
 });
 
 
