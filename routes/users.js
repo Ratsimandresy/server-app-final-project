@@ -87,6 +87,7 @@ router.get("/:id", (req, res, next) => {
   });
 });
 
+
 router.delete("/:id", (req, res, next) => {
     User.findByIdAndDelete(req.params.id).then((userRes) => {
         res.status(200).json(userRes);

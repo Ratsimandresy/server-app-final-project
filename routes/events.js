@@ -12,7 +12,7 @@ router.get("/", (req, res, next) => {
 })
 
 
-/******* GET THE TOP 10 EVENTS => TESTED WITH POSTMAN AND DOESN'T WORK ******/
+/******* GET THE TOP 10 EVENTS ******/
 router.get("/sortedbyrate", (req, res, next) => {
     console.log("I am here for sorted event")
     var mysort = {
@@ -21,6 +21,18 @@ router.get("/sortedbyrate", (req, res, next) => {
     Event.find().sort(mysort).limit(10).then((sortedEvent) => {
         res.status(200).json(sortedEvent);
     }).catch(err => res.status(500).json(err))
+})
+
+
+/******* GET THE EVENTS OF A SPECIFIC USER ******/
+router.get("/ofaspecificuser/:id", (req, res, next) => {
+    console.log("I am here for specific user", req.params.id)
+    Event
+        .find({"userId" : req.params.id })
+        .then((specificUser) => {
+            res.status(200).json(specificUser);
+        }) 
+        .catch(err => res.status(500).json(err))
 })
 
 
