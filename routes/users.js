@@ -44,17 +44,14 @@ router.patch("/:id/edit", (req, res, next) => {
     }).catch(next);
 });
 
-router.patch("/update", uploadCloud.single("profilImage"), uploadCloud.single("newProfileImage"), async (req, res, next) => {
+router.patch("/update", uploadCloud.single("profilImage"), async (req, res, next) => {
     console.log('PATCH /update udate a user profile');
     console.log(req.body);
     userId = req.session.currentUser;
 
-
     try {
         const user = req.body;
-        console.log('req.file: ', req.file);
         if (req.file) {
-            console.log('dans le if');
             user.profilImage = req.file.path;
         }
         if (user.email === '') {
