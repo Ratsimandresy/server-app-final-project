@@ -68,8 +68,7 @@ router.post("/", uploader.single("mainImageUrl"), async (req, res, next) => {
     newEvent.userId = req.session.currentUser;
 
     const createdEvent = await Event.create(newEvent);
-    console.log(createdEvent);
-
+    console.log("------------------>",createdEvent);
     res
       .status(200)
       .json({ createdEvent, message: "Event created successFully" });
