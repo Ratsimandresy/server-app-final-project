@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
-const Scehma = mongoose.Schema;
+const Schema = mongoose.Schema;
 
 const commentSchema = new Schema({
   content: String,
-  event: {
+  eventId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Event",
   },
-  user: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
