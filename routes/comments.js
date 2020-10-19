@@ -3,12 +3,13 @@ const router = express.Router();
 const Comment = require("../models/Comment");
 
 router.get("/", (req, res, next) => {
+  console.log("allcoment here ======>>>>>");
   Comment.find()
     .then((allComment) => {
-      allComment.status(200).json(allComment);
+      res.status(200).json(allComment);
     })
     .catch((err) => {
-      err.status(500).json(err);
+      res.status(500).json(err);
     });
 });
 
@@ -52,12 +53,14 @@ router.post("/", (req, res, next) => {
 /************UPDATE A COMMENT******************* */
 router.patch("/:id", (req, res, next) => {
   console.log("THE BODYYYYYYYYYY", req.body);
-  Comment.create(req.params.id, req.body, { new: true })
+  Comment.create(req.params.id, req.bodys, { new: true })
     .then((res) => {
+      console.log(comment);
       res.status(200).json(res);
     })
     .catch((err) => {
-      res.status(500).json(err);
+      console.log(err);
+      // res.status(500).json(err);
     });
 });
 
