@@ -78,7 +78,7 @@ router.patch("/:id", uploader.single("mainImageUrl"), (req, res, next) => {
   console.log("====>>>>>", req.params.id);
   console.log(updatedEvent);
   if (req.file) {
-    updatedEvent.image = req.file.path;
+    updatedEvent.mainImageUrl = req.file.path;
   }
 
   Event.findByIdAndUpdate(req.params.id, updatedEvent, { new: true })
