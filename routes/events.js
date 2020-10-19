@@ -14,17 +14,13 @@ router.get("/", (req, res, next) => {
 
 /******* GET THE TOP 10 EVENTS ******/
 router.get("/sortedbyrate", (req, res, next) => {
-  console.log("I am here for sorted event");
-  var mysort = {
-    noteAverage: -1,
-  };
-  Event.find()
-    .sort(mysort)
-    .limit(10)
-    .then((sortedEvent) => {
-      res.status(200).json(sortedEvent);
-    })
-    .catch((err) => res.status(500).json(err));
+    console.log("I am here for sorted event");
+    var mysort = {
+        noteAverage: -1
+    };
+    Event.find().sort(mysort).limit(10).populate("tags").populate("category").then((sortedEvent) => {
+        res.status(200).json(sortedEvent);
+    }).catch((err) => res.status(500).json(err));
 });
 
 /******* GET THE EVENTS OF A SPECIFIC USER ******/
@@ -55,10 +51,10 @@ router.post("/", uploader.single("mainImageUrl"), async (req, res, next) => {
       delete newEvent.category;
     }
 
-    if (newEvent.tags) {
-      console.log(newEvent.tags);
-      newEvent.tags = JSON.parse(newEvent.tags);
-    }
+    // if (newEvent.tags) {
+    //   console.log(newEvent.tags);
+    //   newEvent.tags = JSON.parse(newEvent.tags);
+    // }
 
     if (newEvent.location) {
     }
