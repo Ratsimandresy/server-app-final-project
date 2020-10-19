@@ -43,20 +43,10 @@ router.post("/create", (req, res, next) => {
     });
 });
 
-router.patch("/:id/edit", (req, res, next) => {
-  const userId = req.params.id;
-
-  User.findByIdAndUpdate(userId, req.body, { new: true })
-    .then((userDocument) => {
-      res.status(200).json(userDocument);
-    })
-    .catch(next);
-});
-
 router.patch("/update", uploadCloud.single("profilImage"), async (req, res, next) => {
   console.log(req.session);
   userId = req.session.currentUser;
-  
+  console.log("--------------------",req.body)
   try {
     const user = req.body;
     console.log(req.file);
@@ -66,7 +56,9 @@ router.patch("/update", uploadCloud.single("profilImage"), async (req, res, next
     if(req.body.newPassword) {
       user.password =  bcrypt.hashSync(req.body.newPassword, salt);
     }
-
+    if(user.email === ""){
+      delete user.email
+    }
     const updatedUser = await User.findByIdAndUpdate(userId, user, {new: true});
     req.session.currentUser = updatedUser._id;
     res.status(200).json({
@@ -80,7 +72,16 @@ router.patch("/update", uploadCloud.single("profilImage"), async (req, res, next
       message: "Error, can't update this user"
     });
   }
- 
+});
+
+router.patch("/:id/edit", (req, res, next) => {
+  const userId = req.params.id;
+
+  User.findByIdAndUpdate(userId, req.body, { new: true })
+    .then((userDocument) => {
+      res.status(200).json(userDocument);
+    })
+    .catch(next);
 });
 
 router.get("/:id", (req, res, next) => {
