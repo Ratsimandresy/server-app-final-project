@@ -9,6 +9,7 @@ router.get("/", (req, res, next) => {
     .populate("tags")
     .populate("category")
     .populate("userId")
+    .populate("comments")
     .then((eventsList) => {
       res.status(200).json(eventsList);
     })
@@ -27,6 +28,7 @@ router.get("/sortedbyrate", (req, res, next) => {
     .populate("tags")
     .populate("category")
     .populate("userId")
+    .populate("comments")
     .then((sortedEvent) => {
       res.status(200).json(sortedEvent);
     })
