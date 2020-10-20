@@ -5,7 +5,7 @@ const uploader = require("../config/cloudinary");
 
 /************** GET ALL EVENTS *************/
 router.get("/", (req, res, next) => {
-  Event.find()
+  Event.find().populate("tags").populate("category").populate("userId")
     .then((eventsList) => {
       res.status(200).json(eventsList);
     })
