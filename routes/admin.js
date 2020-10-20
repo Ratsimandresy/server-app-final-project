@@ -49,33 +49,64 @@ router.get("/users", async (req, res, next) => {
   }
 });
 
-router.post(
-  "/users",
-  uploadCloud.single("profilImage"),
-  async (req, res, next) => {
-    console.log("POST Creata a new USER for admin");
-    console.log(req.body);
-    const user = req.body;
-    if (req.file) {
-      user.profileImage = req.file.path;
+// router.post(
+//   "/users",
+//   uploadCloud.single("profilImage"),
+//   async (req, res, next) => {
+//     console.log("POST Creata a new USER for admin");
+//     console.log(req.body);
+//     const user = req.body;
+//     if (req.file) {
+//       user.profileImage = req.file.path;
+//     }
+
+//     try {
+//       const cryptedPassword = bcrypt.hashSync(req.body.password, salt);
+//       user.password = cryptedPassword;
+
+//       const createdUser = await User.create(user);
+//       console.log(createdUser);
+
+//       console.log(user);
+
+//       res.status(200).json(user);
+//     } catch (errDb) {
+//       console.log(errDb);
+//       res.status(500).json(errDb);
+//     }
+//   }
+// );
+
+
+router.post("/users", (req, res, next) => {
+  console.log("============= REQ-BODY ===============>", req.body);
+  const { email, password, firstName, gender, lastName, pseudo, address } = req.body;
+
+  User.findOne({ email }).then((userDocument) => {
+    if (userDocument) {
+      return res.status(400).json({ message: "email already taken" });
     }
 
-    try {
-      const cryptedPassword = bcrypt.hashSync(req.body.password, salt);
-      user.password = cryptedPassword;
+    const hashedPassword = bcrypt.hashSync(password, salt);
+    const newUser = {
+      email,
+      lastName,
+      firstName,
+      gender,
+      password: hashedPassword,
+      pseudo,
+      address,
+    };
 
-      const createdUser = await User.create(user);
-      console.log(createdUser);
-
-      console.log(user);
-
-      res.status(200).json(user);
-    } catch (errDb) {
-      console.log(errDb);
-      res.status(500).json(errDb);
-    }
-  }
-);
+    User.create(newUser)
+      .then((userRes) => {
+        res.status(200).json(userRes);
+      })
+      .catch((err) => {
+        res.status(200).json(err);
+      });
+  });
+});
 
 router.patch("/users/:id", async (req, res, next) => {
   console.log("POST Creata a new USER for admin");
@@ -103,17 +134,17 @@ router.patch("/users/:id", async (req, res, next) => {
 });
 
 router.delete("/users/:id", async (req, res, next) => {
-  console.log("POST Creata a new USER for admin");
+  console.log("DELETE A USER for admin");
   console.log(req.body);
   console.log(req.params);
 
   const userId = req.params.id;
 
   console.log(userId);
-  console.log(user);
+  // console.log(user);
 
   try {
-    console.log(user);
+    // console.log(user);
     const deletedUser = await User.findByIdAndRemove(userId);
     console.log(deletedUser);
     //
