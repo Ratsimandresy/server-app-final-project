@@ -18,7 +18,7 @@ router.get("/sortedbyrate", (req, res, next) => {
     var mysort = {
         noteAverage: -1
     };
-    Event.find().sort(mysort).limit(10).populate("tags").populate("category").then((sortedEvent) => {
+    Event.find().sort(mysort).limit(10).populate("tags").populate("category").populate("userId").then((sortedEvent) => {
         res.status(200).json(sortedEvent);
     }).catch((err) => res.status(500).json(err));
 });
