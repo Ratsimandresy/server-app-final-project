@@ -5,7 +5,10 @@ const uploader = require("../config/cloudinary");
 
 /************** GET ALL EVENTS *************/
 router.get("/", (req, res, next) => {
-  Event.find().populate("tags").populate("category").populate("userId")
+  Event.find()
+    .populate("tags")
+    .populate("category")
+    .populate("userId")
     .then((eventsList) => {
       res.status(200).json(eventsList);
     })
@@ -14,26 +17,43 @@ router.get("/", (req, res, next) => {
 
 /******* GET THE TOP 10 EVENTS ******/
 router.get("/sortedbyrate", (req, res, next) => {
-    console.log("I am here for sorted event");
-    var mysort = {
-        noteAverage: -1
-    };
-    Event.find().sort(mysort).limit(10).populate("tags").populate("category").populate("userId").then((sortedEvent) => {
-        res.status(200).json(sortedEvent);
-    }).catch((err) => res.status(500).json(err));
+  console.log("I am here for sorted event");
+  var mysort = {
+    noteAverage: -1,
+  };
+  Event.find()
+    .sort(mysort)
+    .limit(10)
+    .populate("tags")
+    .populate("category")
+    .populate("userId")
+    .then((sortedEvent) => {
+      res.status(200).json(sortedEvent);
+    })
+    .catch((err) => res.status(500).json(err));
 });
 
 /******* GET THE EVENTS OF A SPECIFIC USER ******/
 router.get("/ofaspecificuser/:id", (req, res, next) => {
-    console.log("I am here for specific user", req.params.id)
-    Event
-        .find({"userId" : req.params.id })
-        .then((specificUser) => {
-            res.status(200).json(specificUser);
-        }) 
-        .catch(err => res.status(500).json(err))
-})
+  console.log("I am here for specific user", req.params.id);
+  Event.find({ userId: req.params.id })
+    .then((specificUser) => {
+      res.status(200).json(specificUser);
+    })
+    .catch((err) => res.status(500).json(err));
+});
 
+/******* GET THE EVENTS OF A SPECIFIC COMMENT ******/
+router.patch("/ofaspecificComment/:id", (req, res, next) => {
+  console.log("I am here for specific user", req.params.id);
+  Event.findByIdAndUpdate(req.params.id)
+    .populate("comments")
+    .then((specificComment) => {
+      console.log(specificComment);
+      res.status(200).json(specificComment);
+    })
+    .catch((err) => res.status(500).json(err));
+});
 
 /************** CREATE AN EVENT *************/
 router.post("/", uploader.single("mainImageUrl"), async (req, res, next) => {
