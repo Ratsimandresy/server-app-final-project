@@ -3,7 +3,7 @@ const router = express.Router();
 const Tag = require("../models/Tag");
 
 
-/************* GET ALL CATEGORIES *************/
+/************* GET ALL TAGS *************/
 router.get("/", async (req, res, next) => {
     try {
         const tags = await Tag.find({});
