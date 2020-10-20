@@ -138,6 +138,18 @@ router.get("/tags", async (req, res, next) => {
   }
 });
 
+
+router.get("/tags/:id", (req, res, next) => {
+    console.log("get one tag for admin");
+    Tag
+      .findById(req.params.id)
+      .then((oneTag) => {
+        res.status(200).json(oneTag);
+      })
+      .catch((err) => res.status(500).json(err));
+  });
+
+  
 router.post("/tags", async (req, res, next) => {
   console.log("CREATE A TAG for admin");
 
@@ -175,7 +187,7 @@ router.patch("/tags/:id", async (req, res, next) => {
 
 router.delete("/tags/:id", async (req, res, next) => {
   try {
-    console.log("UPDATE TAG for admin");
+    console.log("DELETE TAG for admin");
     console.log(req.params.id);
     // console.log(req.body.id);
 
