@@ -40,13 +40,15 @@ router.post("/", (req, res, next) => {
   console.log("THE BODYYYYYYYYYY", req.body);
   const newComment = req.body;
   Comment.create(newComment)
+    // .populate("User")
+    // .populate("Event")
     .then((newComm) => {
       console.log(newComment);
       res.status(200).json(newComm);
     })
     .catch((err) => {
       console.log(err);
-        res.status(500).json(err);
+      res.status(500).json(err);
     });
 });
 
