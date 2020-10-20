@@ -6,6 +6,7 @@ const User = require("../models/User");
 const Tag = require("../models/Tag");
 const Category = require("../models/Category");
 const Event = require("../models/Event");
+const uploader = require("../config/cloudinary");
 
 const salt = 10;
 
@@ -49,6 +50,15 @@ router.get("/users", async (req, res, next) => {
   }
 });
 
+router.get("/users/:id", (req, res, next) => {
+  console.log("get one user for admin");
+  User.findById(req.params.id)
+    .then((oneUser) => {
+      res.status(200).json(oneUser);
+    })
+    .catch((err) => res.status(500).json(err));
+});
+
 // router.post(
 //   "/users",
 //   uploadCloud.single("profilImage"),
@@ -77,10 +87,23 @@ router.get("/users", async (req, res, next) => {
 //   }
 // );
 
-
-router.post("/users", (req, res, next) => {
+/************** CREATE A USER  *************/
+router.post("/users", uploader.single("profilImage"), (req, res, next) => {
   console.log("============= REQ-BODY ===============>", req.body);
-  const { email, password, firstName, gender, lastName, pseudo, address } = req.body;
+  const {
+    email,
+    password,
+    firstName,
+    city,
+    age,
+    description,
+    formattedAddress,
+    profilImage,
+    gender,
+    lastName,
+    pseudo,
+    address,
+  } = req.body;
 
   User.findOne({ email }).then((userDocument) => {
     if (userDocument) {
@@ -95,8 +118,17 @@ router.post("/users", (req, res, next) => {
       gender,
       password: hashedPassword,
       pseudo,
+      age,
+      description,
       address,
+      profilImage,
+      formattedAddress,
+      city,
     };
+
+    if (req.file) {
+      newUser.profilImage = req.file.path;
+    }
 
     User.create(newUser)
       .then((userRes) => {
@@ -108,30 +140,44 @@ router.post("/users", (req, res, next) => {
   });
 });
 
-router.patch("/users/:id", async (req, res, next) => {
-  console.log("POST Creata a new USER for admin");
-  console.log(req.body);
-  console.log(req.params);
+router.patch(
+  "/users/:id",
+  uploadCloud.single("profilImage"),
+  async (req, res, next) => {
+    console.log("========REQ-BODY==================>>>>>>>>>>>>", req.body);
+    console.log(req.params);
 
-  const userId = req.params.id;
-  const user = console.log(req.body);
+    const userId = req.params.id;
+    const user = req.body;
 
-  console.log(userId);
-  console.log(user);
+    try {
+      console.log(user);
 
-  try {
-    console.log(user);
-    const updatedUser = await User.findByIdAndUpdate(userId, user, {
-      new: true,
-    });
-    console.log(updatedUser);
-    //
-    res.status(200).json({ updatedUser, message: "user successfully updated" });
-  } catch (errDb) {
-    console.log(errDb);
-    res.status(500).json(errDb);
+      if (req.file) {
+        user.profilImage = req.file.path;
+      }
+      if (user.email === "") {
+        delete user.email;
+      }
+
+      if (req.body.newPassword) {
+        user.password = bcrypt.hashSync(req.body.newPassword, salt);
+      }
+
+      const updatedUser = await User.findByIdAndUpdate(userId, user, {
+        new: true,
+      });
+      console.log(updatedUser);
+      //
+      res
+        .status(200)
+        .json({ updatedUser, message: "user successfully updated" });
+    } catch (errDb) {
+      console.log(errDb);
+      res.status(500).json(errDb);
+    }
   }
-});
+);
 
 router.delete("/users/:id", async (req, res, next) => {
   console.log("DELETE A USER for admin");
@@ -169,18 +215,15 @@ router.get("/tags", async (req, res, next) => {
   }
 });
 
-
 router.get("/tags/:id", (req, res, next) => {
-    console.log("get one tag for admin");
-    Tag
-      .findById(req.params.id)
-      .then((oneTag) => {
-        res.status(200).json(oneTag);
-      })
-      .catch((err) => res.status(500).json(err));
-  });
+  console.log("get one tag for admin");
+  Tag.findById(req.params.id)
+    .then((oneTag) => {
+      res.status(200).json(oneTag);
+    })
+    .catch((err) => res.status(500).json(err));
+});
 
-  
 router.post("/tags", async (req, res, next) => {
   console.log("CREATE A TAG for admin");
 
@@ -246,8 +289,7 @@ router.get("/categories", async (req, res, next) => {
 
 router.get("/category/:id", (req, res, next) => {
   console.log("get one category for admin");
-  Category
-    .findById(req.params.id)
+  Category.findById(req.params.id)
     .then((oneCategory) => {
       res.status(200).json(oneCategory);
     })
@@ -311,7 +353,9 @@ router.get("/events", async (req, res, next) => {
   try {
     const events = await Event.find({});
     console.log(events);
-    res.status(200).json({ events, message: "Get all events succefully" });
+    // res.status(200).json({ events, message: "Get all events succefully" });
+    res.status(200).json(events);
+
   } catch (errDb) {
     res.status(500).json({ errDb, message: "error can't get all events" });
   }
@@ -371,6 +415,7 @@ router.delete("/events/:id", async (req, res, next) => {
   console.log("DELETE a event for admin");
   console.log(req.body);
   console.log(req.params);
+
   const eventId = req.params.id;
 
   try {
