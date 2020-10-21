@@ -35,6 +35,15 @@ router.get("/ofAgivenUser/:id", (req, res, next) => {
     .catch((err) => res.status(500).json(err));
 });
 
+router.get("/:id/comments", (req, res, next) => {
+  console.log("I am here for specific event", req.params.id);
+  Comment.find({ eventId: req.params.id })
+    .then((ofAgivenEvent) => {
+      res.status(200).json(ofAgivenEvent);
+    })
+    .catch((err) => res.status(500).json(err));
+});
+
 /************CREATE A COMMENT******************* */
 router.post("/", (req, res, next) => {
   console.log("THE BODYYYYYYYYYY", req.body);

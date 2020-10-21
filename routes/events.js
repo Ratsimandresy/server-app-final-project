@@ -139,6 +139,24 @@ router.patch(
   }
 );
 
+// router.get("/:id/comments", async (req, res, next) => {
+//   // Get all co,,ents of the event
+
+//   try {
+//     console.log(req.params.id, req.body);
+//     const currentEvent = (await Event.findById(req.params.id)).populate(
+//       "comments"
+//     );
+
+//     res
+//       .status(200)
+//       .json({ currentEvent, message: "Event fetched successFully" });
+//   } catch (errDb) {
+//     console.log(errDb);
+//     res.status(500).json(errDb);
+//   }
+// });
+
 /************** DELETE AN EVENT *************/
 router.delete("/:id", (req, res, next) => {
   Event.findByIdAndRemove(req.params.id)
