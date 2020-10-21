@@ -58,6 +58,17 @@ app.use("/api/event", eventsRouter);
 app.use("/api/tags", tagsRouter);
 app.use("/api/comments", commentsRouter);
 app.use("/api/categories", categoriesRouter);
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
+
+if (process.env.NODE_ENV === "production") {
+  app.use("*", (req, res, next) => {
+    // If no routes match, send them the React HTML.
+    res.sendFile(__dirname + "/public/index.html");
+  });
+}
 
 // 404 Middleware
 app.use((req, res, next) => {
