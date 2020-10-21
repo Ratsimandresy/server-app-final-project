@@ -8,26 +8,34 @@ const bcrypt = require("bcrypt");
 const salt = 10;
 
 router.get("/", (req, res, next) => {
-  User.find()
-    .then((userRes) => res.status(200).json(userRes))
-    .catch((err) => {
-      res.status(200).json(err);
+    User.find().then((userRes) => res.status(200).json(userRes)).catch((err) => {
+        res.status(200).json(err);
     });
 });
 
 router.get("/me", async (req, res, next) => {
+    try {
+        const userId = req.session.currentUser;
+        console.log(userId);
+        const currentUser = await User.findById(userId);
+        const userEvents = await Event.find({userId: userId}).populate("tags").populate("category");
+        console.log(currentUser);
+        console.log(userEvents);
+        res.status(200).json({currentUser, userEvents});
+    } catch (errDb) {
+        res.status(500).json(currentUser);
+    }
+});
+
+router.get("/me/favevents", async (req, res, next) => {
   try {
-    const userId = req.session.currentUser;
-    console.log(userId);
-    const currentUser = await User.findById(userId);
-    const userEvents = await Event.find({ userId: userId })
-      .populate("tags")
-      .populate("category");
-    console.log(currentUser);
-    console.log(userEvents);
-    res.status(200).json({ currentUser, userEvents });
+      const userId = req.session.currentUser;
+      const currentUser = await User.findById(userId);    
+      console.log(currentUser);
+
+      res.status(200).json(currentUser);
   } catch (errDb) {
-    res.status(500).json(currentUser);
+      res.status(500).json(currentUser);
   }
 });
 
@@ -40,100 +48,127 @@ router.get("/me", async (req, res, next) => {
 // });
 
 router.post("/create", (req, res, next) => {
-  console.log("============= REQ-BODY ===============>", req.body);
-  const { email, password, firstName, gender, lastName, pseudo, address } = req.body;
+    console.log("============= REQ-BODY ===============>", req.body);
+    const {
+        email,
+        password,
+        firstName,
+        gender,
+        lastName,
+        pseudo,
+        address
+    } = req.body;
 
-  User.findOne({ email }).then((userDocument) => {
-    if (userDocument) {
-      return res.status(400).json({ message: "email already taken" });
+    User.findOne({email}).then((userDocument) => {
+        if (userDocument) {
+            return res.status(400).json({message: "email already taken"});
+        }
+
+        const hashedPassword = bcrypt.hashSync(password, salt);
+        const newUser = {
+            email,
+            lastName,
+            firstName,
+            gender,
+            password: hashedPassword,
+            pseudo,
+            address
+        };
+
+        User.create(newUser).then((userRes) => {
+            res.status(200).json(userRes);
+        }).catch((err) => {
+            res.status(200).json(err);
+        });
+    });
+});
+
+router.patch("/fav-event", async (req, res, next) => {
+    console.log("PATCH Favorite event for a user");
+    console.log(req.body);
+    try {
+
+        userId = req.session.currentUser;
+        const events = req.body.events;
+        console.log(events);
+        const uploadUser = await User.findById(userId);
+        console.log(uploadUser);
+        const objectUser = uploadUser.toObject({ getters: true});
+
+        //console.log(objectUser);
+        objectUser.events = events;
+
+        console.log(objectUser);
+        
+        const favEventsUser = await User.findByIdAndUpdate(userId, objectUser, {new: true});
+        
+        console.log('----------------------', favEventsUser);
+
+        // console.log(favEventsUser);
+        // const objFavevents = favEventsUser.toObject();
+        // console.log(objFavevents);
+
+        res.status(200).json(favEventsUser);
+    } catch (errDb) {
+        console.log(errDb);
+        res.status(500).json(errDb);
     }
 
-    const hashedPassword = bcrypt.hashSync(password, salt);
-    const newUser = {
-      email,
-      lastName,
-      firstName,
-      gender,
-      password: hashedPassword,
-      pseudo,
-      address,
-    };
-
-    User.create(newUser)
-      .then((userRes) => {
-        res.status(200).json(userRes);
-      })
-      .catch((err) => {
-        res.status(200).json(err);
-      });
-  });
 });
 
 router.patch("/:id/edit", (req, res, next) => {
-  const userId = req.params.id;
+    const userId = req.params.id;
 
-  User.findByIdAndUpdate(userId, req.body, { new: true })
-    .then((userDocument) => {
-      res.status(200).json(userDocument);
-    })
-    .catch(next);
+    User.findByIdAndUpdate(userId, req.body, {new: true}).then((userDocument) => {
+        res.status(200).json(userDocument);
+    }).catch(next);
 });
 
-router.patch(
-  "/update",
-  uploadCloud.single("profilImage"),
-  async (req, res, next) => {
+router.patch("/update", uploadCloud.single("profilImage"), async (req, res, next) => {
     console.log("PATCH /update udate a user profile");
     console.log(req.body);
     userId = req.session.currentUser;
 
     try {
-      const user = req.body;
-      if (req.file) {
-        user.profilImage = req.file.path;
-      }
-      if (user.email === "") {
-        delete user.email;
-      }
+        const user = req.body;
+        if (req.file) {
+            user.profilImage = req.file.path;
+        }
+        if (user.email === "") {
+            delete user.email;
+        }
 
-      if (req.body.newPassword) {
-        user.password = bcrypt.hashSync(req.body.newPassword, salt);
-      }
+        if (req.body.newPassword) {
+            user.password = bcrypt.hashSync(req.body.newPassword, salt);
+        }
 
-      const updatedUser = await User.findByIdAndUpdate(userId, user, {
-        new: true,
-      });
-      console.log(updatedUser);
-      req.session.currentUser = updatedUser._id;
-      res
-        .status(200)
-        .json({ updatedUser, message: "user updated successfully" });
+        const updatedUser = await User.findByIdAndUpdate(userId, user, {new: true});
+        console.log(updatedUser);
+        req.session.currentUser = updatedUser._id;
+        res.status(200).json({updatedUser, message: "user updated successfully"});
     } catch (errDb) {
-      console.log(errDb);
-      res.status(500).json({ errDb, message: "Error, can't update this user" });
+        console.log(errDb);
+        res.status(500).json({errDb, message: "Error, can't update this user"});
     }
-  }
-);
+});
+
 
 router.get("/:id", (req, res, next) => {
-  const userID = req.params.id;
-  User.findById(userID)
-    .populate("events")
-    .then((userRes) => {
-      res.status(200).json(userRes);
-    })
-    .catch((err) => {
-      res.status(200).json(err);
+    const userID = req.params.id;
+    User.findById(userID).populate("events").then((userRes) => {
+        res.status(200).json(userRes);
+    }).catch((err) => {
+        res.status(200).json(err);
     });
 });
 
+
 router.delete("/:id", (req, res, next) => {
-  User.findByIdAndDelete(req.params.id)
-    .then((userRes) => {
-      res.status(200).json(userRes);
-    })
-    .catch(next);
+    User.findByIdAndDelete(req.params.id).then((userRes) => {
+        res.status(200).json(userRes);
+    }).catch(next);
 });
+
 
 // Like an event
 
