@@ -30,11 +30,13 @@ const eventSchema = new Schema({
     },
     formattedAddress: String,
   },
-  infos: {
-    date: Date,
-    hour: Number,
-    min: Number,
-  },
+  // infos: {
+  //   date: Date,
+  //   hour: Number,
+  //   min: Number,
+  // },
+  time: Date,
+  infos: Date,
   city: String,
   userId: {
     type: Schema.Types.ObjectId,

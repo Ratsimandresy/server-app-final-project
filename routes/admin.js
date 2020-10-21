@@ -355,10 +355,18 @@ router.get("/events", async (req, res, next) => {
     console.log(events);
     // res.status(200).json({ events, message: "Get all events succefully" });
     res.status(200).json(events);
-
   } catch (errDb) {
     res.status(500).json({ errDb, message: "error can't get all events" });
   }
+});
+
+router.get("/events/:id", (req, res, next) => {
+  console.log("get one event for admin");
+  Event.findById(req.params.id)
+    .then((oneEvent) => {
+      res.status(200).json(oneEvent);
+    })
+    .catch((err) => err.status(500).json(err));
 });
 
 router.post(
@@ -389,22 +397,19 @@ router.patch(
   "/events/:id",
   uploadCloud.single("mainImageUrl"),
   async (req, res, next) => {
-    console.log("PATCH update Event for admin");
     const event = req.body;
     const eventId = req.params.id;
-
-    if (req.file) {
-      event.mainImageUrl = req.file.path;
-    }
-
     try {
-      const updatedEvent = await Event.findByIdAndUpdate(eventId, even, {
+      if (req.file) {
+        event.mainImageUrl = req.file.path;
+      }
+
+      const updatedEvent = await Event.findByIdAndUpdate(eventId, event, {
         new: true,
       });
-      console.log(updatedEvent);
-      res
-        .status(200)
-        .json({ updatedEvent, message: "Events succefully updated" });
+
+      console.log("MY NEW EVENT ==============>", updatedEvent);
+      res.status(200).json(updatedEvent);
     } catch (errDb) {
       res.status(500).json({ errDb, message: "error can't update events" });
     }
