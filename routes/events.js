@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Event = require("../models/Event");
+const User = require("../models/User");
 const uploader = require("../config/cloudinary");
 
 /************** GET ALL EVENTS *************/
@@ -83,9 +84,23 @@ router.post("/", uploader.single("mainImageUrl"), async (req, res, next) => {
 
     newEvent.userId = req.session.currentUser;
 
-    newEvent.userId = req.session.currentUser;
-
     const createdEvent = await Event.create(newEvent);
+    const user = await User.findById(req.session.currentUser);
+    const userEvents = user.events;
+    const newEventId = createdEvent._id;
+
+    console.log('user events :', userEvents);
+    console.log('EventId: ', newEventId, ' ', typeof newEventId );
+    userEvents.push(newEventId);
+    console.log('user events after push: ', userEvents);
+    const objUserEvents = userEvents.toObject({ getters: true});
+    console.log(typeof objUserEvents);
+    const newEvents = {
+      events: objUserEvents
+    };
+    const updatedUser =  await User.findByIdAndUpdate(req.session.currentUser, newEvents, {new: true});
+    console.log('updated', updatedUser);
+
     console.log(createdEvent);
 
     res
