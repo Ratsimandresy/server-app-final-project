@@ -16,7 +16,7 @@ const cors = require("cors");
  */
 const corsOptions = {
   origin: process.env.FRONTEND_URL,
-   credentials: true,
+  credentials: true,
 };
 app.use(cors(corsOptions));
 app.use(logger("dev")); // This logs HTTP reponses in the console.
@@ -31,8 +31,7 @@ app.use(
     resave: true,
     saveUninitialized: true,
   })
-);
-
+)
 // Test to see if user is logged In before getting into any router.
 app.use(function (req, res, next) {
   console.log("User in session =>", req.session.currentUser);
